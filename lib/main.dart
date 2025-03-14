@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project1/recipe.dart';
 
 void main() {
   runApp(const RecipeApp());
@@ -32,10 +33,19 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(title: Text("MainScreen"), backgroundColor: Colors.blue),
       body: Column(
         children: [
-          ListTile(
-            leading: Icon(Icons.food_bank),
-            title: Text('Recipe Title'),
-            trailing: Icon(Icons.list),
+          GestureDetector(
+            child: ListTile(
+              // list of recipe
+              leading: Icon(Icons.food_bank),
+              title: Text('Recipe Title'),
+              trailing: Icon(Icons.list),
+            ),
+            onTap: () {
+              // tap to transition to Recipe Screen
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const RecipeScreen()),
+              );
+            },
           ),
         ],
       ),
