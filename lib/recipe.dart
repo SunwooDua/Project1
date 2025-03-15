@@ -15,7 +15,9 @@ class _RecipeScreenState extends State<RecipeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.recipe['name']),
+        title: Text(
+          widget.recipe['name'],
+        ), // use widget to get recipe from RecipeScreen above
         backgroundColor: Colors.green,
       ),
       body: Column(),
