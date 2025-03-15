@@ -27,27 +27,43 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  // list containig recipes
+  List<Map<String, dynamic>> recipes = [
+    // used dynamics incase any other than string is needed
+    {
+      'name': 'Soy-sauce Egg Rice',
+      'ingredients':
+          'Soy Sauce (2Tbsp or more), Eggs (usually 2), Rice (1 bowl), Sesame Oil (1Tbsp or more)',
+      'instruction':
+          'prepare rice (steam), prepare fried eggs, prepare spoon of soy sauce and ssame oil, mix them all and enjoy!',
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("MainScreen"), backgroundColor: Colors.blue),
-      body: Column(
-        children: [
-          GestureDetector(
-            child: ListTile(
+      body: GestureDetector(
+        child: ListView.builder(
+          itemCount: recipes.length, // number of recipes in recipe list
+          itemBuilder: (context, index) {
+            return ListTile(
               // list of recipe
               leading: Icon(Icons.food_bank),
-              title: Text('Recipe Title'),
+              title: Text(
+                recipes[index]['name'],
+              ), // display name of recipe matching index
+              // moved inside of ListTile since its now under List.View
+              onTap: () {
+                // tap to transition to Recipe Screen
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const RecipeScreen()),
+                );
+              },
               trailing: Icon(Icons.list),
-            ),
-            onTap: () {
-              // tap to transition to Recipe Screen
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const RecipeScreen()),
-              );
-            },
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }
