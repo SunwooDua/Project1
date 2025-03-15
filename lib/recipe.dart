@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'recipedata.dart';
 
 class RecipeScreen extends StatefulWidget {
   final Map<String, dynamic> recipe;
@@ -14,9 +15,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.recipe['name'],
-        ), // need to use widget to access recipe in widget RecipeScreen
+        title: Text('Recipe Screen'),
         backgroundColor: Colors.green,
       ),
       body: Column(),
