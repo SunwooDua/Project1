@@ -12,6 +12,7 @@ class RecipeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false, // do not show this banner
       title: 'RecipeApp',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: MainScreen(),
@@ -21,17 +22,20 @@ class RecipeApp extends StatelessWidget {
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
-
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
+  Set<String> favoriteRecipes = {}; // store favorite recipes by name
+
   List<Map<String, dynamic>> filteredRecipes = recipes;
   bool isVegan = false;
   bool isVegetarian = false;
   bool isGlutenFree = false;
+  bool showFavoritesOnly = false; // NEW: Filter for favorites
 
+  // method to apply filters and update displayed recipe list
   void _applyFilters() {
     setState(() {
       filteredRecipes =
@@ -39,11 +43,25 @@ class _MainScreenState extends State<MainScreen> {
             if (isVegan && recipe['vegan'] != true) return false;
             if (isVegetarian && recipe['vegetarian'] != true) return false;
             if (isGlutenFree && recipe['glutenFree'] != true) return false;
+            if (showFavoritesOnly && !favoriteRecipes.contains(recipe['name']))
+              return false; // NEW: Filter favorites
             return true;
           }).toList();
     });
   }
 
+  // method to toggle favorite status of a recipe
+  void _toggleFavorite(String recipeName) {
+    setState(() {
+      if (favoriteRecipes.contains(recipeName)) {
+        favoriteRecipes.remove(recipeName); // remove from favorites
+      } else {
+        favoriteRecipes.add(recipeName); // add to favorites
+      }
+    });
+  }
+
+  // method to display filter options in a bottom modal sheet
   void _showFilterOptions() {
     showModalBottomSheet(
       context: context,
@@ -78,6 +96,13 @@ class _MainScreenState extends State<MainScreen> {
                     value: isGlutenFree,
                     onChanged: (value) {
                       setSheetState(() => isGlutenFree = value!);
+                    },
+                  ),
+                  CheckboxListTile(
+                    title: Text("Show Favorites Only"), // NEW: Favorite filter
+                    value: showFavoritesOnly,
+                    onChanged: (value) {
+                      setSheetState(() => showFavoritesOnly = value!);
                     },
                   ),
                   SizedBox(height: 10),
@@ -125,7 +150,18 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               );
             },
-            trailing: Icon(Icons.list),
+            trailing: IconButton(
+              onPressed: () {
+                _toggleFavorite(filteredRecipes[index]['name']);
+              },
+              icon: Icon(
+                Icons.favorite,
+                color:
+                    favoriteRecipes.contains(filteredRecipes[index]['name'])
+                        ? Colors.red
+                        : Colors.grey, // if favorited, color is red else grey
+              ),
+            ),
           );
         },
       ),
