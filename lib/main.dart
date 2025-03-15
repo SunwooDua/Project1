@@ -23,12 +23,13 @@ class RecipeApp extends StatelessWidget {
 class MainScreen extends StatefulWidget {
   // main screen
   const MainScreen({super.key});
-
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
+  bool favorite = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +56,26 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 );
               },
-              trailing: Icon(Icons.list),
+              trailing: IconButton(
+                onPressed: () {
+                  //change state of favorite based on press
+                  setState(() {
+                    if (favorite == true) {
+                      favorite = false;
+                    } else {
+                      favorite = true;
+                    }
+                  });
+                },
+                icon: Icon(
+                  Icons.favorite,
+                  color:
+                      favorite
+                          ? Colors.red
+                          : Colors
+                              .grey, // if favorite is true, color is red else grey
+                ),
+              ),
             );
           },
         ),
