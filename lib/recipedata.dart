@@ -7,5 +7,8 @@ List<Map<String, dynamic>> recipes = [
         'Soy Sauce (2Tbsp or more), Eggs (usually 2), Rice (1 bowl), Sesame Oil (1Tbsp or more)',
     'instruction':
         'prepare rice (steam), prepare fried eggs, prepare spoon of soy sauce and ssame oil, mix them all and enjoy!',
+    'vegan': false,
+    'vegetarian': true,
+    'glutenFree': false,
   },
 ];
