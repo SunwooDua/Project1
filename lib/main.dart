@@ -12,6 +12,7 @@ class RecipeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false, // do not show this banner
       title: 'RecipeApp',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: MainScreen(),
@@ -50,7 +51,7 @@ class _MainScreenState extends State<MainScreen> {
                     builder:
                         (context) => RecipeScreen(
                           recipe: recipes[index],
-                        ), // pass current index to recipe.dart
+                        ), // pass current index to recipe.dart),
                   ),
                 );
               },
