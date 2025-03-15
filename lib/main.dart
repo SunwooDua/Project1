@@ -73,7 +73,7 @@ class _MainScreenState extends State<MainScreen> {
                       favorite
                           ? Colors.red
                           : Colors
-                              .white, // if favorite is true, color is red else white
+                              .grey, // if favorite is true, color is red else grey
                 ),
               ),
             );
