@@ -55,7 +55,10 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 );
               },
-              trailing: Icon(Icons.list),
+              trailing: IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.favorite),
+              ),
             );
           },
         ),
