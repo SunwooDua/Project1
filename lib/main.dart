@@ -46,7 +46,12 @@ class _MainScreenState extends State<MainScreen> {
               onTap: () {
                 // tap to transition to Recipe Screen
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const RecipeScreen()),
+                  MaterialPageRoute(
+                    builder:
+                        (context) => RecipeScreen(
+                          recipe: recipes[index],
+                        ), // pass current index to recipe.dart
+                  ),
                 );
               },
               trailing: Icon(Icons.list),
