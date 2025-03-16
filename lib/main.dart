@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:project1/database_helper.dart';
 import 'package:project1/recipe.dart';
 import 'recipedata.dart';
 import 'package:path/path.dart'
     as path; // it kept conflicting withshowModalBottomsheet so added ad path
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // for desktop
 
 void main() {
+  sqfliteFfiInit(); // Initialize FFI for desktop platforms
+  databaseFactory = databaseFactoryFfi;
   runApp(const RecipeApp());
 }
 
@@ -31,6 +35,9 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
+  List<Map<String, dynamic>> savedRecipes = []; // Store saved recipe
+
   Set<String> favoriteRecipes = {}; // store favorite recipes by name
 
   List<Map<String, dynamic>> filteredRecipes = recipes;
@@ -38,17 +45,40 @@ class _MainScreenState extends State<MainScreen> {
   bool isVegetarian = false;
   bool isGlutenFree = false;
   bool showFavoritesOnly = false; // NEW: Filter for favorites
+  bool showSavedOnly = false; // NEW: Filter for saved recipes
+
+  // upon initiazation, load saved recipe
+  void initState() {
+    super.initState();
+    loadSavedRecipe();
+  }
+
+  // function to load recipe and convert into list to be fit in UI
+  Future<void> loadSavedRecipe() async {
+    List<Map<String, dynamic>> saved = await _databaseHelper.getSavedRecipe();
+    setState(() {
+      savedRecipes = saved;
+    });
+  }
 
   // method to apply filters and update displayed recipe list
   void _applyFilters() {
     setState(() {
       filteredRecipes =
           recipes.where((recipe) {
-            if (isVegan && recipe['vegan'] != true) return false;
-            if (isVegetarian && recipe['vegetarian'] != true) return false;
-            if (isGlutenFree && recipe['glutenFree'] != true) return false;
+            // check if type continas vegan, vegetarian, or gluten-free
+            if (isVegan && !recipe['type']!.contains('vegan')) return false;
+            if (isVegetarian && !recipe['type']!.contains('vegetarian'))
+              return false;
+            if (isGlutenFree && !recipe['type']!.contains('gluten-free'))
+              return false;
             if (showFavoritesOnly && !favoriteRecipes.contains(recipe['name']))
               return false; // NEW: Filter favorites
+            if (showSavedOnly &&
+                !savedRecipes.any(
+                  (savedRecipe) => savedRecipe['name'] == recipe['name'],
+                ))
+              return false; // NEW: Filter saved
             return true;
           }).toList();
     });
@@ -109,6 +139,13 @@ class _MainScreenState extends State<MainScreen> {
                       setSheetState(() => showFavoritesOnly = value!);
                     },
                   ),
+                  CheckboxListTile(
+                    title: Text("Show Saved Only"), // NEW: Saved filter
+                    value: showSavedOnly,
+                    onChanged: (value) {
+                      setSheetState(() => showSavedOnly = value!);
+                    },
+                  ),
                   SizedBox(height: 10),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -154,17 +191,45 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               );
             },
-            trailing: IconButton(
-              onPressed: () {
-                _toggleFavorite(filteredRecipes[index]['name']);
-              },
-              icon: Icon(
-                Icons.favorite,
-                color:
-                    favoriteRecipes.contains(filteredRecipes[index]['name'])
-                        ? Colors.red
-                        : Colors.grey, // if favorited, color is red else grey
-              ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min, // to make sure it wont overflow
+              children: [
+                IconButton(
+                  // button for favorite
+                  onPressed: () {
+                    _toggleFavorite(filteredRecipes[index]['name']);
+                  },
+                  icon: Icon(
+                    Icons.favorite,
+                    color:
+                        favoriteRecipes.contains(filteredRecipes[index]['name'])
+                            ? Colors.red
+                            : Colors
+                                .grey, // if favorited, color is red else grey
+                  ),
+                ),
+                IconButton(
+                  // button for saving recipe to local storage
+                  onPressed: () async {
+                    // recipe to save in database is filterRecipes
+                    Map<String, dynamic> recipeToSave = recipes[index];
+                    await _databaseHelper.saveRecipe(recipeToSave);
+                    loadSavedRecipe();
+                  },
+                  icon: Icon(
+                    Icons.save,
+                    color:
+                        savedRecipes.any(
+                              (recipe) =>
+                                  recipe['name'] ==
+                                  filteredRecipes[index]['name'],
+                            )
+                            ? Colors
+                                .green // if saved
+                            : Colors.grey, // if not saved
+                  ),
+                ),
+              ],
             ),
           );
         },
