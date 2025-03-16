@@ -26,39 +26,47 @@ class _RecipeScreenState extends State<RecipeScreen> {
         ), // use widget to get recipe from RecipeScreen above
         backgroundColor: Colors.green,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 500,
-              width: 500,
+      body: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment
+                .stretch, // make sure there is no blank space on width
+        children: [
+          Expanded(
+            flex: 5, // ratio of each part
+            child: Container(
               decoration: BoxDecoration(
                 color: Colors.blueGrey,
                 image: DecorationImage(
                   image: AssetImage(widget.recipe['image']),
+                  fit:
+                      BoxFit
+                          .fitHeight, // stretch it to fit the containers height
                 ),
               ),
             ),
-            Container(
-              height: 100,
-              width: 500,
+          ),
+          Expanded(
+            flex: 1, // one this to be smallest
+            child: Container(
               decoration: BoxDecoration(color: Colors.blueAccent),
-              child: Text(widget.recipe['type']),
+              child: Text('Type : ${widget.recipe['type']}'),
             ),
-            Container(
-              height: 500,
-              width: 500,
+          ),
+          Expanded(
+            flex: 3,
+            child: Container(
               decoration: BoxDecoration(color: Colors.yellow),
-              child: Text(widget.recipe['ingredients']),
+              child: Text('Ingredients : \n ${widget.recipe['ingredients']}'),
             ),
-            Container(
-              height: 500,
-              width: 500,
+          ),
+          Expanded(
+            flex: 3,
+            child: Container(
               decoration: BoxDecoration(color: Colors.lightGreen),
-              child: Text(widget.recipe['instruction']),
+              child: Text('Instructions : \n ${widget.recipe['instruction']}'),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
