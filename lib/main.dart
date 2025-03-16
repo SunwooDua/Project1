@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:project1/recipe.dart';
 import 'recipedata.dart';
+import 'package:path/path.dart'
+    as path; // it kept conflicting withshowModalBottomsheet so added ad path
 import 'package:sqflite/sqflite.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(const RecipeApp());
