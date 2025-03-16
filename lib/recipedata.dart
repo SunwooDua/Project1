@@ -11,6 +11,7 @@ List<Map<String, dynamic>> recipes = [
         'Soy Sauce (2Tbsp or more), Eggs (usually 2), Rice (1 bowl), Sesame Oil (1Tbsp or more)',
     'instruction':
         'prepare rice (steam), prepare fried eggs, prepare spoon of soy sauce and ssame oil, mix them all and enjoy!',
-    'type': 'vegan & gluten-free',
+    'type':
+        'vegan & gluten-free', // need to be string in order to be used in sql database
   },
 ];

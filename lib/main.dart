@@ -76,6 +76,7 @@ class _MainScreenState extends State<MainScreen> {
               return false; // NEW: Filter favorites
             if (showSavedOnly &&
                 !savedRecipes.any(
+                  //check if recipe name is in savedRecipe name
                   (savedRecipe) => savedRecipe['name'] == recipe['name'],
                 ))
               return false; // NEW: Filter saved
