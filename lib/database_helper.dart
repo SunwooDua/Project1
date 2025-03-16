@@ -12,7 +12,8 @@ class DatabaseHelper {
   final String columnId = '_id';
   final String columnName = 'name';
   final String columnIngredients = 'ingredients';
-  final String columnInstructions = 'instructions';
+  final String columnInstructions = 'instruction';
+  final String columnTypes = 'type';
 
   // create private constructor for Database
   DatabaseHelper._constructor();
@@ -38,9 +39,12 @@ class DatabaseHelper {
           $columnId INTEGER PRIMARY KEY, 
           $columnName TEXT NOT NULL,
           $columnIngredients TEXT,
-          $columnInstructions TEXT
+          $columnInstructions TEXT,
+          $columnTypes TEXT
+
         )
         ''');
+        print('Table created successfully'); // debug
       },
     );
     return database;
@@ -64,7 +68,10 @@ class DatabaseHelper {
     Database db =
         await DatabaseHelper.instance.database; //getting database instance
 
+    // Fetch recipes from the database
+    List<Map<String, dynamic>> recipes = await db.query(table);
+
     // insert database into table
-    return await db.query(DatabaseHelper.instance.table);
+    return recipes;
   }
 }

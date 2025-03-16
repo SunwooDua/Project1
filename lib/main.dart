@@ -66,12 +66,18 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       filteredRecipes =
           recipes.where((recipe) {
-            if (isVegan && recipe['vegan'] != true) return false;
-            if (isVegetarian && recipe['vegetarian'] != true) return false;
-            if (isGlutenFree && recipe['glutenFree'] != true) return false;
+            // check if type continas vegan, vegetarian, or gluten-free
+            if (isVegan && !recipe['type']!.contains('vegan')) return false;
+            if (isVegetarian && !recipe['type']!.contains('vegetarian'))
+              return false;
+            if (isGlutenFree && !recipe['type']!.contains('gluten-free'))
+              return false;
             if (showFavoritesOnly && !favoriteRecipes.contains(recipe['name']))
               return false; // NEW: Filter favorites
-            if (showSavedOnly && !savedRecipes.contains(recipe['name']))
+            if (showSavedOnly &&
+                !savedRecipes.any(
+                  (savedRecipe) => savedRecipe['name'] == recipe['name'],
+                ))
               return false; // NEW: Filter saved
             return true;
           }).toList();
@@ -206,8 +212,9 @@ class _MainScreenState extends State<MainScreen> {
                   // button for saving recipe to local storage
                   onPressed: () async {
                     // recipe to save in database is filterRecipes
-                    Map<String, dynamic> recipeToSave = filteredRecipes[index];
+                    Map<String, dynamic> recipeToSave = recipes[index];
                     await _databaseHelper.saveRecipe(recipeToSave);
+                    loadSavedRecipe();
                   },
                   icon: Icon(
                     Icons.save,
