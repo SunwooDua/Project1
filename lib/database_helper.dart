@@ -31,13 +31,14 @@ class DatabaseHelper {
     final database = await openDatabase(
       // actual function and logic for database
       databasePath,
+      version: 1,
       onCreate: (db, version) {
         db.execute('''
         CREATE TABLE $table (
           $columnId INTEGER PRIMARY KEY, 
           $columnName TEXT NOT NULL,
           $columnIngredients TEXT,
-          $columnInstructions TEXT,
+          $columnInstructions TEXT
         )
         ''');
       },

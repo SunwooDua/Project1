@@ -6,8 +6,11 @@ import 'package:path/path.dart'
     as path; // it kept conflicting withshowModalBottomsheet so added ad path
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // for desktop
 
 void main() {
+  sqfliteFfiInit(); // Initialize FFI for desktop platforms
+  databaseFactory = databaseFactoryFfi;
   runApp(const RecipeApp());
 }
 
@@ -33,21 +36,28 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
+  List<Map<String, dynamic>> savedRecipes = []; // Store saved recipe
 
   Set<String> favoriteRecipes = {}; // store favorite recipes by name
 
   List<Map<String, dynamic>> filteredRecipes = recipes;
-  List<Map<String, dynamic>> savedRecipes = []; // store saved recipes
   bool isVegan = false;
   bool isVegetarian = false;
   bool isGlutenFree = false;
   bool showFavoritesOnly = false; // NEW: Filter for favorites
+  bool showSavedOnly = false; // NEW: Filter for saved recipes
 
-  // method to load saved recipe locally
-  void loadRecipe() async {
-    final save = await _databaseHelper.getSavedRecipe();
+  // upon initiazation, load saved recipe
+  void initState() {
+    super.initState();
+    loadSavedRecipe();
+  }
+
+  // function to load recipe and convert into list to be fit in UI
+  Future<void> loadSavedRecipe() async {
+    List<Map<String, dynamic>> saved = await _databaseHelper.getSavedRecipe();
     setState(() {
-      savedRecipes = save;
+      savedRecipes = saved;
     });
   }
 
@@ -61,6 +71,8 @@ class _MainScreenState extends State<MainScreen> {
             if (isGlutenFree && recipe['glutenFree'] != true) return false;
             if (showFavoritesOnly && !favoriteRecipes.contains(recipe['name']))
               return false; // NEW: Filter favorites
+            if (showSavedOnly && !savedRecipes.contains(recipe['name']))
+              return false; // NEW: Filter saved
             return true;
           }).toList();
     });
@@ -121,6 +133,13 @@ class _MainScreenState extends State<MainScreen> {
                       setSheetState(() => showFavoritesOnly = value!);
                     },
                   ),
+                  CheckboxListTile(
+                    title: Text("Show Saved Only"), // NEW: Saved filter
+                    value: showSavedOnly,
+                    onChanged: (value) {
+                      setSheetState(() => showSavedOnly = value!);
+                    },
+                  ),
                   SizedBox(height: 10),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -151,11 +170,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("MainScreen"),
-        backgroundColor: Colors.blue,
-        actions: [IconButton(onPressed: loadRecipe, icon: Icon(Icons.save))],
-      ),
+      appBar: AppBar(title: Text("MainScreen"), backgroundColor: Colors.blue),
       body: ListView.builder(
         itemCount: filteredRecipes.length,
         itemBuilder: (context, index) {
@@ -194,7 +209,18 @@ class _MainScreenState extends State<MainScreen> {
                     Map<String, dynamic> recipeToSave = filteredRecipes[index];
                     await _databaseHelper.saveRecipe(recipeToSave);
                   },
-                  icon: Icon(Icons.download, color: Colors.black),
+                  icon: Icon(
+                    Icons.save,
+                    color:
+                        savedRecipes.any(
+                              (recipe) =>
+                                  recipe['name'] ==
+                                  filteredRecipes[index]['name'],
+                            )
+                            ? Colors
+                                .green // if saved
+                            : Colors.grey, // if not saved
+                  ),
                 ),
               ],
             ),
