@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project1/database_helper.dart';
 import 'package:project1/recipe.dart';
 import 'recipedata.dart';
 import 'package:path/path.dart'
@@ -31,13 +32,24 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
+
   Set<String> favoriteRecipes = {}; // store favorite recipes by name
 
   List<Map<String, dynamic>> filteredRecipes = recipes;
+  List<Map<String, dynamic>> savedRecipes = []; // store saved recipes
   bool isVegan = false;
   bool isVegetarian = false;
   bool isGlutenFree = false;
   bool showFavoritesOnly = false; // NEW: Filter for favorites
+
+  // method to load saved recipe locally
+  void loadRecipe() async {
+    final save = await _databaseHelper.getSavedRecipe();
+    setState(() {
+      savedRecipes = save;
+    });
+  }
 
   // method to apply filters and update displayed recipe list
   void _applyFilters() {
@@ -139,7 +151,11 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("MainScreen"), backgroundColor: Colors.blue),
+      appBar: AppBar(
+        title: Text("MainScreen"),
+        backgroundColor: Colors.blue,
+        actions: [IconButton(onPressed: loadRecipe, icon: Icon(Icons.save))],
+      ),
       body: ListView.builder(
         itemCount: filteredRecipes.length,
         itemBuilder: (context, index) {
@@ -154,17 +170,33 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               );
             },
-            trailing: IconButton(
-              onPressed: () {
-                _toggleFavorite(filteredRecipes[index]['name']);
-              },
-              icon: Icon(
-                Icons.favorite,
-                color:
-                    favoriteRecipes.contains(filteredRecipes[index]['name'])
-                        ? Colors.red
-                        : Colors.grey, // if favorited, color is red else grey
-              ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min, // to make sure it wont overflow
+              children: [
+                IconButton(
+                  // button for favorite
+                  onPressed: () {
+                    _toggleFavorite(filteredRecipes[index]['name']);
+                  },
+                  icon: Icon(
+                    Icons.favorite,
+                    color:
+                        favoriteRecipes.contains(filteredRecipes[index]['name'])
+                            ? Colors.red
+                            : Colors
+                                .grey, // if favorited, color is red else grey
+                  ),
+                ),
+                IconButton(
+                  // button for saving recipe to local storage
+                  onPressed: () async {
+                    // recipe to save in database is filterRecipes
+                    Map<String, dynamic> recipeToSave = filteredRecipes[index];
+                    await _databaseHelper.saveRecipe(recipeToSave);
+                  },
+                  icon: Icon(Icons.download, color: Colors.black),
+                ),
+              ],
             ),
           );
         },
