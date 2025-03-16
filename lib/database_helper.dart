@@ -45,3 +45,25 @@ class DatabaseHelper {
     return database;
   }
 }
+
+// functions to save recipes for offline use
+Future<int> saveRecipe(Map<String, dynamic> recipe) async {
+  Database db =
+      await DatabaseHelper.instance.database; //getting database instance
+
+  // insert database into table
+  return await db.insert(
+    DatabaseHelper.instance.table,
+    recipe,
+    conflictAlgorithm: ConflictAlgorithm.replace,
+  );
+}
+
+// functions to get recipes for offline use
+Future<List<Map<String, dynamic>>> getSavedRecipe() async {
+  Database db =
+      await DatabaseHelper.instance.database; //getting database instance
+
+  // insert database into table
+  return await db.query(DatabaseHelper.instance.table);
+}
