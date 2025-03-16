@@ -26,8 +26,39 @@ class _RecipeScreenState extends State<RecipeScreen> {
         ), // use widget to get recipe from RecipeScreen above
         backgroundColor: Colors.green,
       ),
-      body: Column(
-        children: [Image(image: AssetImage(widget.recipe['image']))],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              height: 500,
+              width: 500,
+              decoration: BoxDecoration(
+                color: Colors.blueGrey,
+                image: DecorationImage(
+                  image: AssetImage(widget.recipe['image']),
+                ),
+              ),
+            ),
+            Container(
+              height: 100,
+              width: 500,
+              decoration: BoxDecoration(color: Colors.blueAccent),
+              child: Text(widget.recipe['type']),
+            ),
+            Container(
+              height: 500,
+              width: 500,
+              decoration: BoxDecoration(color: Colors.yellow),
+              child: Text(widget.recipe['ingredients']),
+            ),
+            Container(
+              height: 500,
+              width: 500,
+              decoration: BoxDecoration(color: Colors.lightGreen),
+              child: Text(widget.recipe['instruction']),
+            ),
+          ],
+        ),
       ),
     );
   }
