@@ -14,6 +14,7 @@ class DatabaseHelper {
   final String columnIngredients = 'ingredients';
   final String columnInstructions = 'instruction';
   final String columnTypes = 'type';
+  final String columImages = 'image';
 
   // create private constructor for Database
   DatabaseHelper._constructor();
@@ -40,7 +41,8 @@ class DatabaseHelper {
           $columnName TEXT NOT NULL,
           $columnIngredients TEXT,
           $columnInstructions TEXT,
-          $columnTypes TEXT
+          $columnTypes TEXT,
+          $columImages TEXT
 
         )
         ''');

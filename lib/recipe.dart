@@ -26,7 +26,9 @@ class _RecipeScreenState extends State<RecipeScreen> {
         ), // use widget to get recipe from RecipeScreen above
         backgroundColor: Colors.green,
       ),
-      body: Column(),
+      body: Column(
+        children: [Image(image: AssetImage(widget.recipe['image']))],
+      ),
     );
   }
 }

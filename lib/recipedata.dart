@@ -13,6 +13,7 @@ List<Map<String, dynamic>> recipes = [
         'prepare rice (steam), prepare fried eggs, prepare spoon of soy sauce and ssame oil, mix them all and enjoy!',
     'type':
         'vegan & gluten-free', // need to be string in order to be used in sql database
+    'image': 'assets/soy.jpg',
   },
   {
     'name': 'Gochujang Egg Rice',
@@ -22,5 +23,6 @@ List<Map<String, dynamic>> recipes = [
         'prepare rice (steam), prepare fried eggs, prepare spoon of gochujang sauce and ssame oil, mix them all and enjoy!',
     'type':
         'vegetarian', // need to be string in order to be used in sql database
+    'image': 'assets/gochujang.jpg',
   },
 ];
