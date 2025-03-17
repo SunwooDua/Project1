@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:project1/database_helper.dart';
 import 'package:project1/recipe.dart';
+import 'package:project1/meal_planner_screen.dart'; // Import the new screen
 import 'recipedata.dart';
-import 'package:path/path.dart'
-    as path; // it kept conflicting withshowModalBottomsheet so added ad path
+import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // for desktop
@@ -44,6 +44,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
   List<Map<String, dynamic>> savedRecipes = []; // Store saved recipe
+  List<Map<String, dynamic>> mealPlanRecipes = []; // Store meal plan recipes
 
   Set<String> favoriteRecipes = {}; // store favorite recipes by name
 
@@ -51,13 +52,16 @@ class _MainScreenState extends State<MainScreen> {
   bool isVegan = false;
   bool isVegetarian = false;
   bool isGlutenFree = false;
-  bool showFavoritesOnly = false; // NEW: Filter for favorites
-  bool showSavedOnly = false; // NEW: Filter for saved recipes
+  bool showFavoritesOnly = false; // Filter for favorites
+  bool showSavedOnly = false; // Filter for saved recipes
+  bool showMealPlanOnly = false; // NEW: Filter for meal plan recipes
 
-  // upon initiazation, load saved recipe
+  // upon initiazation, load saved recipe and meal plan recipes
+  @override
   void initState() {
     super.initState();
     loadSavedRecipe();
+    loadMealPlanRecipes();
   }
 
   // function to load recipe and convert into list to be fit in UI
@@ -68,25 +72,39 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  // NEW: Function to load meal plan recipes
+  Future<void> loadMealPlanRecipes() async {
+    List<Map<String, dynamic>> mealPlan =
+        await _databaseHelper.getMealPlanRecipes();
+    setState(() {
+      mealPlanRecipes = mealPlan;
+    });
+  }
+
   // method to apply filters and update displayed recipe list
   void _applyFilters() {
     setState(() {
       filteredRecipes =
           recipes.where((recipe) {
-            // check if type continas vegan, vegetarian, or gluten-free
+            // check if type contains vegan, vegetarian, or gluten-free
             if (isVegan && !recipe['type']!.contains('vegan')) return false;
             if (isVegetarian && !recipe['type']!.contains('vegetarian'))
               return false;
             if (isGlutenFree && !recipe['type']!.contains('gluten-free'))
               return false;
             if (showFavoritesOnly && !favoriteRecipes.contains(recipe['name']))
-              return false; // NEW: Filter favorites
+              return false;
             if (showSavedOnly &&
                 !savedRecipes.any(
-                  //check if recipe name is in savedRecipe name
                   (savedRecipe) => savedRecipe['name'] == recipe['name'],
                 ))
-              return false; // NEW: Filter saved
+              return false;
+            // NEW: Filter for meal plan recipes
+            if (showMealPlanOnly &&
+                !mealPlanRecipes.any(
+                  (mealPlanRecipe) => mealPlanRecipe['name'] == recipe['name'],
+                ))
+              return false;
             return true;
           }).toList();
     });
@@ -101,6 +119,25 @@ class _MainScreenState extends State<MainScreen> {
         favoriteRecipes.add(recipeName); // add to favorites
       }
     });
+  }
+
+  // NEW: Method to toggle meal plan status of a recipe
+  void _toggleMealPlan(Map<String, dynamic> recipe) async {
+    // Check if recipe is already in meal plan
+    bool isInMealPlan = mealPlanRecipes.any(
+      (mealPlanRecipe) => mealPlanRecipe['name'] == recipe['name'],
+    );
+
+    if (isInMealPlan) {
+      // Remove from meal plan
+      await _databaseHelper.removeFromMealPlan(recipe['name']);
+    } else {
+      // Add to meal plan
+      await _databaseHelper.addToMealPlan(recipe);
+    }
+
+    // Reload meal plan recipes
+    loadMealPlanRecipes();
   }
 
   // method to display filter options in a bottom modal sheet
@@ -141,17 +178,25 @@ class _MainScreenState extends State<MainScreen> {
                     },
                   ),
                   CheckboxListTile(
-                    title: Text("Show Favorites Only"), // NEW: Favorite filter
+                    title: Text("Show Favorites Only"),
                     value: showFavoritesOnly,
                     onChanged: (value) {
                       setSheetState(() => showFavoritesOnly = value!);
                     },
                   ),
                   CheckboxListTile(
-                    title: Text("Show Saved Only"), // NEW: Saved filter
+                    title: Text("Show Saved Only"),
                     value: showSavedOnly,
                     onChanged: (value) {
                       setSheetState(() => showSavedOnly = value!);
+                    },
+                  ),
+                  // NEW: Meal Plan filter
+                  CheckboxListTile(
+                    title: Text("Show Meal Plan Only"),
+                    value: showMealPlanOnly,
+                    onChanged: (value) {
+                      setSheetState(() => showMealPlanOnly = value!);
                     },
                   ),
                   SizedBox(height: 10),
@@ -184,7 +229,28 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("MainScreen"), backgroundColor: Colors.blue),
+      appBar: AppBar(
+        title: Text("MainScreen"),
+        backgroundColor: Colors.blue,
+        actions: [
+          // Meal Planner button in app bar
+          IconButton(
+            icon: Icon(Icons.calendar_today),
+            onPressed: () {
+              Navigator.of(context)
+                  .push(
+                    MaterialPageRoute(
+                      builder: (context) => MealPlannerScreen(),
+                    ),
+                  )
+                  .then(
+                    (_) => loadMealPlanRecipes(),
+                  ); // Refresh after returning
+            },
+            tooltip: "Meal Planner",
+          ),
+        ],
+      ),
       body: ListView.builder(
         itemCount: filteredRecipes.length,
         itemBuilder: (context, index) {
@@ -202,8 +268,8 @@ class _MainScreenState extends State<MainScreen> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min, // to make sure it wont overflow
               children: [
+                // Favorite button
                 IconButton(
-                  // button for favorite
                   onPressed: () {
                     _toggleFavorite(filteredRecipes[index]['name']);
                   },
@@ -216,11 +282,30 @@ class _MainScreenState extends State<MainScreen> {
                                 .grey, // if favorited, color is red else grey
                   ),
                 ),
+                // Meal planner button
                 IconButton(
-                  // button for saving recipe to local storage
+                  onPressed: () {
+                    _toggleMealPlan(filteredRecipes[index]);
+                  },
+                  icon: Icon(
+                    Icons.restaurant_menu,
+                    color:
+                        mealPlanRecipes.any(
+                              (recipe) =>
+                                  recipe['name'] ==
+                                  filteredRecipes[index]['name'],
+                            )
+                            ? Colors
+                                .orange // if in meal plan
+                            : Colors.grey, // if not in meal plan
+                  ),
+                  tooltip: "Add to Meal Plan",
+                ),
+                // Save button
+                IconButton(
                   onPressed: () async {
-                    // recipe to save in database is filterRecipes
-                    Map<String, dynamic> recipeToSave = recipes[index];
+                    // recipe to save in database is filteredRecipes
+                    Map<String, dynamic> recipeToSave = filteredRecipes[index];
                     await _databaseHelper.saveRecipe(recipeToSave);
                     loadSavedRecipe();
                   },
