@@ -9,10 +9,10 @@ List<Map<String, dynamic>> recipes = [
     'name': 'Soy-sauce Egg Rice',
     'ingredients':
         'Soy Sauce (2Tbsp or more), Eggs (usually 2), Rice (1 bowl), Sesame Oil (1Tbsp or more)',
-    'instruction':
-        'prepare rice (steam), prepare fried eggs, prepare spoon of soy sauce and ssame oil, mix them all and enjoy!',
+    'instruction': // i want to display step in new line. will be using replace thus instead of , used &
+        '1) prepare rice (steam) & 2) prepare fried eggs & 3) prepare spoon of soy sauce and sessame oil & 4) mix them all and enjoy!',
     'type':
-        'vegan & gluten-free', // need to be string in order to be used in sql database
+        'vegetarian', // need to be string in order to be used in sql database
     'image': 'assets/soy.jpg',
   },
   {
@@ -20,9 +20,19 @@ List<Map<String, dynamic>> recipes = [
     'ingredients':
         'Gochujang (2Tbsp or more), Eggs (usually 2), Rice (1 bowl), Sesame Oil (1Tbsp or more)',
     'instruction':
-        'prepare rice (steam), prepare fried eggs, prepare spoon of gochujang sauce and ssame oil, mix them all and enjoy!',
+        '1) prepare rice (steam) & 2) prepare fried eggs & 3) prepare spoon of gochujang sauce and sessame oil & 4) mix them all and enjoy!',
     'type':
         'vegetarian', // need to be string in order to be used in sql database
     'image': 'assets/gochujang.jpg',
+  },
+  {
+    'name': 'Korean Style Corn Cheese',
+    'ingredients':
+        'drainned canned corn, buter (tbsp), sugar (1 tbsp), mayonnaise (3 tbsp), shredded mozarella cheese',
+    'instruction':
+        '1) drain canned corn & heat skillet with butter & 2) mix corn, sugar, and mayonnaise and spread them on heated skillet & 3) on top, spread mozarella chesse and wait for cheese to melt and enjoy!',
+    'type':
+        'gluten-free', // need to be string in order to be used in sql database
+    'image': 'assets/corncheese.jpg',
   },
 ];
