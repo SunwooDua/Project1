@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:project1/database_helper.dart';
 import 'package:project1/recipe.dart';
@@ -9,8 +11,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // for desktop
 
 void main() {
-  sqfliteFfiInit(); // Initialize FFI for desktop platforms
-  databaseFactory = databaseFactoryFfi;
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    // if any desktop platform...
+    sqfliteFfiInit(); // Initialize FFI for desktop platforms
+    databaseFactory = databaseFactoryFfi;
+  } else {
+    databaseFactory = databaseFactory;
+  }
   runApp(const RecipeApp());
 }
 
