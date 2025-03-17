@@ -72,7 +72,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    'Ingredients : \n ${widget.recipe['ingredients']}',
+                    'Ingredients : \n ${widget.recipe['ingredients'].replaceAll(',', '\n')}',
                   ),
                 ),
               ),
