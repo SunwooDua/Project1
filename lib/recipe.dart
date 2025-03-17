@@ -54,6 +54,8 @@ class _RecipeScreenState extends State<RecipeScreen> {
               ), //0x = #, FF = 100 opacity, color code
               child: FittedBox(
                 // adjuest font size automatically to fit the container
+                alignment:
+                    Alignment.topLeft, // make sure it starts from top left
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text('Type : ${widget.recipe['type']}'),
@@ -66,6 +68,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
             child: Container(
               decoration: BoxDecoration(color: Color(0xFFede8c7)),
               child: FittedBox(
+                alignment: Alignment.topLeft,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
@@ -80,10 +83,11 @@ class _RecipeScreenState extends State<RecipeScreen> {
             child: Container(
               decoration: BoxDecoration(color: Color(0xFFd698c1)),
               child: FittedBox(
+                alignment: Alignment.topLeft,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    'Instructions : \n ${widget.recipe['instruction']}',
+                    'Instructions : \n ${widget.recipe['instruction'].replaceAll('&', '\n')}', // replace & with \n so every step is in new line
                   ),
                 ),
               ),
