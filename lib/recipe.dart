@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sqflite/utils/utils.dart';
 import 'recipedata.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -24,7 +25,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
         title: Text(
           widget.recipe['name'],
         ), // use widget to get recipe from RecipeScreen above
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.lime,
       ),
       body: Column(
         crossAxisAlignment:
@@ -48,22 +49,44 @@ class _RecipeScreenState extends State<RecipeScreen> {
           Expanded(
             flex: 1, // one this to be smallest
             child: Container(
-              decoration: BoxDecoration(color: Colors.blueAccent),
-              child: Text('Type : ${widget.recipe['type']}'),
+              decoration: BoxDecoration(
+                color: Color(0xFFd5f0a8),
+              ), //0x = #, FF = 100 opacity, color code
+              child: FittedBox(
+                // adjuest font size automatically to fit the container
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('Type : ${widget.recipe['type']}'),
+                ),
+              ),
             ),
           ),
           Expanded(
             flex: 3,
             child: Container(
-              decoration: BoxDecoration(color: Colors.yellow),
-              child: Text('Ingredients : \n ${widget.recipe['ingredients']}'),
+              decoration: BoxDecoration(color: Color(0xFFede8c7)),
+              child: FittedBox(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Ingredients : \n ${widget.recipe['ingredients']}',
+                  ),
+                ),
+              ),
             ),
           ),
           Expanded(
             flex: 3,
             child: Container(
-              decoration: BoxDecoration(color: Colors.lightGreen),
-              child: Text('Instructions : \n ${widget.recipe['instruction']}'),
+              decoration: BoxDecoration(color: Color(0xFFd698c1)),
+              child: FittedBox(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Instructions : \n ${widget.recipe['instruction']}',
+                  ),
+                ),
+              ),
             ),
           ),
         ],
